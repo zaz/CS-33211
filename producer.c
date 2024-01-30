@@ -3,7 +3,7 @@
 #include <stdio.h>     // for printf
 #include <unistd.h>    // for ftruncate
 
-const unsigned int tableSize = 2;
+const unsigned int tableSize = 2 * 4;  // 2 words
 
 int main() {
     int fd = shm_open("/producerConsumerTable", O_CREAT | O_RDWR, 0666);
