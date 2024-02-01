@@ -3,6 +3,8 @@
 #include <stdio.h>     // for printf
 #include <unistd.h>    // for ftruncate
 
+// TODO: security: restrict syscalls with SECCOMP
+
 const unsigned int tableSize = 2 * 4;  // 2 words
 
 int main() {
@@ -21,7 +23,11 @@ int main() {
         return 1;
     }
     unsigned int *p = (unsigned int*) ptr;
+
+    // TODO: produce random items
     *p = 0xdeadbeef;
     printf("producer: %d\n", *p);
     return 0;
 }
+
+// TODO: close shared memeory on exit
