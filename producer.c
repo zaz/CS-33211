@@ -25,8 +25,13 @@ int main() {
     unsigned int *p = (unsigned int*) ptr;
 
     // TODO: produce random items
-    *p = 0xdeadbeef;
+    *p = 0xDEADBEEF;
     printf("producer: %d\n", *p);
+
+    // create pointer to the second item
+    unsigned int *q = p + 1;
+    *q = 0xB0BABABE;
+
     return 0;
 }
 
