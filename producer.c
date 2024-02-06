@@ -5,24 +5,32 @@
 
 // TODO: security: restrict syscalls with SECCOMP
 
+const char *sharedMemoryName = "/producerConsumerTable";
 const unsigned int tableSize = 2 * 4;  // 2 words
 
-int main() {
+unsigned int* initializeSharedMemory() {
     int fd = shm_open("/producerConsumerTable", O_CREAT | O_RDWR, 0666);
     if (fd == -1) {
         perror("shm_open");
-        return 1;
+        return NULL;
     }
     if (ftruncate(fd, tableSize) == -1) {
         perror("ftruncate");
-        return 1;
+        return NULL;
     }
     void *ptr = mmap(NULL, tableSize, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     if (ptr == MAP_FAILED) {
         perror("mmap");
+        return NULL;
+    }
+    return (unsigned int*) ptr;
+}
+
+int main() {
+    unsigned int *p = initializeSharedMemory();
+    if (p == NULL) {
         return 1;
     }
-    unsigned int *p = (unsigned int*) ptr;
 
     // TODO: produce random items
     *p = 0xDEADBEEF;
