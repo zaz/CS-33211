@@ -9,6 +9,11 @@
 const char *sharedMemoryName = "/producerConsumerTable";
 const unsigned int nItems = 2;
 const unsigned int itemSize = 4;  // 1 word (32 bits) per item
+// create an array of integers
+const unsigned short int items[14] = {
+    0xDEAD, 0xBEEF, 0xB0BA, 0xBABE, 0x0BAD, 0xCAFE, 0xF00D,
+    0x0BEE, 0x0F00, 0x0DAD, 0xC0DE, 0xFACE, 0xB00B, 0x0CAB
+};
 
 // Derived constants
 const unsigned int tableSize = nItems * itemSize;
@@ -34,12 +39,12 @@ unsigned int* initializeSharedMemory(
 
 void produceItems(unsigned int *p, unsigned int nItems) {
     // TODO: produce random items
-    *p = 0xDEADBEEF;
+    *p = 0xDEAD;
     printf("producer: %d\n", *p);
 
     // create pointer to the second item
     unsigned int *q = p + 1;
-    *q = 0xB0BABABE;
+    *q = 0xBEEF;
 }
 
 int main() {
