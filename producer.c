@@ -8,8 +8,9 @@
 const char *sharedMemoryName = "/producerConsumerTable";
 const unsigned int tableSize = 2 * 4;  // 2 words
 
-unsigned int* initializeSharedMemory() {
-    int fd = shm_open("/producerConsumerTable", O_CREAT | O_RDWR, 0666);
+unsigned int* initializeSharedMemory(
+    const char *sharedMemoryName, const unsigned int tableSize) {
+    int fd = shm_open(sharedMemoryName, O_CREAT | O_RDWR, 0666);
     if (fd == -1) {
         perror("shm_open");
         return NULL;
@@ -27,10 +28,8 @@ unsigned int* initializeSharedMemory() {
 }
 
 int main() {
-    unsigned int *p = initializeSharedMemory();
-    if (p == NULL) {
-        return 1;
-    }
+    unsigned int *p = initializeSharedMemory(sharedMemoryName, tableSize);
+    if (p == NULL) { return 1; }
 
     // TODO: produce random items
     *p = 0xDEADBEEF;
