@@ -5,8 +5,13 @@
 
 // TODO: security: restrict syscalls with SECCOMP
 
+// Modifiable constants
 const char *sharedMemoryName = "/producerConsumerTable";
-const unsigned int tableSize = 2 * 4;  // 2 words
+const unsigned int nItems = 2;
+const unsigned int itemSize = 4;  // 1 word (32 bits) per item
+
+// Derived constants
+const unsigned int tableSize = nItems * itemSize;
 
 unsigned int* initializeSharedMemory(
     const char *sharedMemoryName, const unsigned int tableSize) {
@@ -27,10 +32,7 @@ unsigned int* initializeSharedMemory(
     return (unsigned int*) ptr;
 }
 
-int main() {
-    unsigned int *p = initializeSharedMemory(sharedMemoryName, tableSize);
-    if (p == NULL) { return 1; }
-
+void produceItems(unsigned int *p, unsigned int nItems) {
     // TODO: produce random items
     *p = 0xDEADBEEF;
     printf("producer: %d\n", *p);
@@ -38,6 +40,13 @@ int main() {
     // create pointer to the second item
     unsigned int *q = p + 1;
     *q = 0xB0BABABE;
+}
+
+int main() {
+    unsigned int *p = initializeSharedMemory(sharedMemoryName, tableSize);
+    if (p == NULL) { return 1; }
+
+    produceItems(p, nItems);
 
     return 0;
 }
