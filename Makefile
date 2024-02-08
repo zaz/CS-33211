@@ -5,15 +5,19 @@ flags = -Wall -Wextra
 .PHONY: all clean test
 
 # default action
-all: producer
+all: producer consumer
 
 # compile producer
 producer: producer.c
 	gcc $(flags) -o producer producer.c
 
+consumer: consumer.c
+	gcc $(flags) -o consumer consumer.c
+
 clean:
-	rm -f producer
+	rm -f producer consumer
 
 # compile and run producer
-test: producer
-	./producer
+test: producer consumer
+	./producer &
+	./consumer &

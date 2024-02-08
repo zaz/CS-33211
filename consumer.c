@@ -9,17 +9,12 @@
 const char *sharedMemoryName = "/producerConsumerTable";
 const unsigned int nSlots = 2;    // number of slots on the table
 const unsigned int itemSize = 4;  // 1 word (32 bits) per item
-// create an array of integers
-const unsigned int nItems = 14;
-const unsigned short int items[14] = {
-    0xDEAD, 0xBEEF, 0xB0BA, 0xBABE, 0x0BAD, 0xCAFE, 0xF00D,
-    0x0BEE, 0x0F00, 0x0DAD, 0xC0DE, 0xFACE, 0xB00B, 0x0CAB
-};
 
 // Derived constants
 const unsigned int tableSize = nSlots * itemSize;
 
 
+// TODO: move this into its own header
 unsigned int* initializeSharedMemory(
     const char *sharedMemoryName, const unsigned int tableSize) {
     int fd = shm_open(sharedMemoryName, O_CREAT | O_RDWR, 0666);
@@ -39,23 +34,16 @@ unsigned int* initializeSharedMemory(
     return (unsigned int*) ptr;
 }
 
-void produceItems(unsigned int *p, unsigned int nSlots) {
-    for (unsigned int item = 0; item < nItems; ++item) {
-        unsigned int* firstEmptySlot = NULL;
-        while (1) {
-            if (firstEmptySlot != NULL){
-                *firstEmptySlot = items[item];
-            } else {
-                for (unsigned int slot = 0; slot < nSlots; ++slot) {
-                    if (*(p + slot) == 0) {
-                        printf("Table slot %d empty. Produce 0x%x\n", slot, items[item]);
-                        firstEmptySlot = p + slot;
-                        break;
-                    }
-                }
+void consumeItems(unsigned int *p, unsigned int nSlots) {
+    while (1) {
+        for (unsigned int slot = 0; slot < nSlots; ++slot) {
+            if (*(p + slot) != 0) {
+                printf("Table slot %d full. Consume 0x%x\n", slot, *(p + slot));
+                *(p + slot) = 0;
+                break;
             }
-            sleep(1);
         }
+        sleep(1);
     }
 }
 
@@ -63,7 +51,7 @@ int main() {
     unsigned int *p = initializeSharedMemory(sharedMemoryName, tableSize);
     if (p == NULL) { return 1; }
 
-    produceItems(p, nSlots);
+    consumeItems(p, nSlots);
 
     return 0;
 }
