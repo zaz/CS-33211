@@ -2,6 +2,7 @@
 #include <fcntl.h>     // for O_* constants
 #include <stdio.h>     // for printf
 #include <unistd.h>    // for ftruncate
+#include "sharedMemory.h"
 
 // TODO: security: restrict syscalls with SECCOMP
 
@@ -19,25 +20,6 @@ const unsigned short int items[14] = {
 // Derived constants
 const unsigned int tableSize = nSlots * itemSize;
 
-
-unsigned int* initializeSharedMemory(
-    const char *sharedMemoryName, const unsigned int tableSize) {
-    int fd = shm_open(sharedMemoryName, O_CREAT | O_RDWR, 0666);
-    if (fd == -1) {
-        perror("shm_open");
-        return NULL;
-    }
-    if (ftruncate(fd, tableSize) == -1) {
-        perror("ftruncate");
-        return NULL;
-    }
-    void *ptr = mmap(NULL, tableSize, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-    if (ptr == MAP_FAILED) {
-        perror("mmap");
-        return NULL;
-    }
-    return (unsigned int*) ptr;
-}
 
 void produceItems(unsigned int *p, unsigned int nSlots) {
     for (unsigned int item = 0; item < nItems; ++item) {
